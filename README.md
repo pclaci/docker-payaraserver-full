@@ -58,6 +58,11 @@ COPY myapplication.war /opt/payara41/glassfish/domains/domain1/autodeploy
 
 # Details
 
-* Payara is located in the `/opt/payara41` directory. This is deliberately free of any versioning so that any scripts written to work with one version can be seamlessly migrated to the latest docker image.
-* Full and Web editions are derived from the OpenJDK 8 images with a Debian Jessie base
-* Micro editions are built on OpenJDK 8 images with an Alpine linux base to keep image size as small as possible.
+Payara Server installation is located in the `/opt/payara41` directory. This directory is the default working directory of the docker image. The directory name is deliberately free of any versioning so that any scripts written to work with one version can be seamlessly migrated to the latest docker image.
+
+- Full and Web editions are derived from the OpenJDK 8 images with a Debian Jessie base
+- Micro editions are built on OpenJDK 8 images with an Alpine linux base to keep image size as small as possible.
+
+Payara Server is a patched, enhanced and supported application server derived from GlassFish Server Open Source Edition 4.x. Visit [www.payara.fish](http://www.payara.fish) for full 24/7 support and lots of free resources.
+
+Full Payara Server and Payara Micro documentation: [https://payara.gitbooks.io/payara-server/content/](https://payara.gitbooks.io/payara-server/content/)
