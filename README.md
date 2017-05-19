@@ -44,7 +44,7 @@ Once admin port is exposed, it is possible to deploy applications remotely, outs
 
 ### Deployment on startup
 
-Payara Server automatically deploys all deployable files in the `autodeploy` directory of the current domain. For example `/opt/payara41/glassfish/domains/domain1/autodeploy` in the default domain `domain1`.
+By default, Payara server automatically deploys all deployable files in the directory specified by the `AUTODEPLOY_DIR` environment variable (it refers to the `autodeploy` directory in the default domain `domain1`). If you use the default domain (`domain1`),  For example `/opt/payara41/glassfish/domains/domain1/autodeploy` in the default domain `domain1`.
 
 You can mount this folder as a docker volume to a directory, which contains your applications. The following will run Payara Server in the docker and will start applications that exist in the directory `~/payara/apps` on the local file-system:
 
