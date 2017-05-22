@@ -7,9 +7,6 @@ RUN \
 ENV ADMIN_USER admin
 
 ENV PAYARA_PATH /opt/payara41
-ENV DEPLOY_DIR ${PAYARA_PATH}/deployments
-ENV PAYARA_DOMAIN domain1
-ENV AUTODEPLOY_DIR ${PAYARA_PATH}/glassfish/domains/${PAYARA_DOMAIN}/autodeploy
 
 RUN \ 
  mkdir -p ${PAYARA_PATH}/deployments && \
@@ -45,13 +42,22 @@ RUN echo 'AS_ADMIN_PASSWORD='${ADMIN_PASSWORD}'\n\
 EOF\n'\
 >> /opt/pwdfile
 
+ # domain1
+RUN ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/tmpfile change-admin-password
+
+ # payaradomain
 RUN \
- ${PAYARA_PATH}/bin/asadmin start-domain ${PAYARA_DOMAIN} && \
- ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/tmpfile change-admin-password && \
+ ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/tmpfile change-admin-password --domain_name=payaradomain && \
+ ${PAYARA_PATH}/bin/asadmin start-domain payaradomain && \
  ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/pwdfile enable-secure-admin && \
- ${PAYARA_PATH}/bin/asadmin stop-domain && \
+ ${PAYARA_PATH}/bin/asadmin stop-domain payaradomain
+
 # cleanup
- rm /opt/tmpfile
+RUN rm /opt/tmpfile
+
+ENV PAYARA_DOMAIN domain1
+ENV DEPLOY_DIR ${PAYARA_PATH}/deployments
+ENV AUTODEPLOY_DIR ${PAYARA_PATH}/glassfish/domains/${PAYARA_DOMAIN}/autodeploy
 
 # Default payara ports to expose
 EXPOSE 4848 8009 8080 8181
