@@ -43,7 +43,10 @@ EOF\n'\
 >> /opt/pwdfile
 
  # domain1
-RUN ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/tmpfile change-admin-password
+RUN ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/tmpfile change-admin-password && \
+ ${PAYARA_PATH}/bin/asadmin start-domain domain1 && \
+ ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/pwdfile enable-secure-admin && \
+ ${PAYARA_PATH}/bin/asadmin stop-domain domain1
 
  # payaradomain
 RUN \

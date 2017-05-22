@@ -36,11 +36,7 @@ To boot and export admin interface on port 4848 (and also the default HTTP liste
 docker run -p 4848:4848 -p 8080:8080 payara/server-full
 ```
 
-In the default `domain1` domain, the admin interface is not secured, accessible using HTTP on the host machine: [http://localhost:4848](http://localhost:4848).
-
-In the `payaradomain`, the admin interface is secured by default, accessible using HTTPS on the host machine: [https://localhost:4848](https://localhost:4848).
-
-The default user and password is `admin` in both domains.
+Because Payara Server doesn't allow insecure remote admin connections (outside of a Docker container), the admin interface is secured by default (in both the default `domain1` as well as `payaradomain`), accessible using HTTPS on the host machine: [https://localhost:4848](https://localhost:4848) The default user and password is `admin`.
 
 ## Application deployment
 
