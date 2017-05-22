@@ -7,60 +7,61 @@ RUN \
 ENV ADMIN_USER admin
 
 ENV PAYARA_PATH /opt/payara41
-ENV DEPLOY_DIR $PAYARA_PATH/deployments
-ENV AUTODEPLOY_DIR $PAYARA_PATH/glassfish/domains/domain1/autodeploy
+ENV DEPLOY_DIR ${PAYARA_PATH}/deployments
+ENV PAYARA_DOMAIN domain1
+ENV AUTODEPLOY_DIR ${PAYARA_PATH}/glassfish/domains/${PAYARA_DOMAIN}/autodeploy
 
 RUN \ 
- mkdir -p $PAYARA_PATH/deployments && \
- useradd -b /opt -m -s /bin/bash -d $PAYARA_PATH payara && echo payara:payara | chpasswd
+ mkdir -p ${PAYARA_PATH}/deployments && \
+ useradd -b /opt -m -s /bin/bash -d ${PAYARA_PATH} payara && echo payara:payara | chpasswd
 
 # specify Payara version to download
 ENV PAYARA_PKG https://s3-eu-west-1.amazonaws.com/payara.fish/Payara+Downloads/Payara+4.1.2.172/payara-4.1.2.172.zip
 ENV PAYARA_VERSION 172
 
-ENV PKG_FILE_NAME payara-full-$PAYARA_VERSION.zip
+ENV PKG_FILE_NAME payara-full-${PAYARA_VERSION}.zip
 
 # Download Payara Server and install
 RUN \
- wget --quiet -O /opt/$PKG_FILE_NAME $PAYARA_PKG && \
- unzip -qq /opt/$PKG_FILE_NAME -d /opt && \
+ wget --quiet -O /opt/${PKG_FILE_NAME} ${PAYARA_PKG} && \
+ unzip -qq /opt/${PKG_FILE_NAME} -d /opt && \
  chown -R payara:payara /opt && \
  # cleanup
- rm /opt/$PKG_FILE_NAME
+ rm /opt/${PKG_FILE_NAME}
 
 USER payara
-WORKDIR $PAYARA_PATH
+WORKDIR ${PAYARA_PATH}
 
 # set credentials to admin/admin 
 
 ENV ADMIN_PASSWORD admin
 
 RUN echo 'AS_ADMIN_PASSWORD=\n\
-AS_ADMIN_NEWPASSWORD='$ADMIN_PASSWORD'\n\
+AS_ADMIN_NEWPASSWORD='${ADMIN_PASSWORD}'\n\
 EOF\n'\
 >> /opt/tmpfile
 
-RUN echo 'AS_ADMIN_PASSWORD='$ADMIN_PASSWORD'\n\
+RUN echo 'AS_ADMIN_PASSWORD='${ADMIN_PASSWORD}'\n\
 EOF\n'\
 >> /opt/pwdfile
 
 RUN \
- $PAYARA_PATH/bin/asadmin start-domain && \
- $PAYARA_PATH/bin/asadmin --user $ADMIN_USER --passwordfile=/opt/tmpfile change-admin-password && \
- $PAYARA_PATH/bin/asadmin --user $ADMIN_USER --passwordfile=/opt/pwdfile enable-secure-admin && \
- $PAYARA_PATH/bin/asadmin stop-domain && \
+ ${PAYARA_PATH}/bin/asadmin start-domain ${PAYARA_DOMAIN} && \
+ ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/tmpfile change-admin-password && \
+ ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/pwdfile enable-secure-admin && \
+ ${PAYARA_PATH}/bin/asadmin stop-domain && \
 # cleanup
  rm /opt/tmpfile
 
 # Default payara ports to expose
 EXPOSE 4848 8009 8080 8181
 
-ENV DEPLOY_COMMANDS=$PAYARA_PATH/post-boot-commands.asadmin
-COPY generate_deploy_commands.sh $PAYARA_PATH/generate_deploy_commands.sh
+ENV DEPLOY_COMMANDS=${PAYARA_PATH}/post-boot-commands.asadmin
+COPY generate_deploy_commands.sh ${PAYARA_PATH}/generate_deploy_commands.sh
 USER root
 RUN \
- chown -R payara:payara $PAYARA_PATH/generate_deploy_commands.sh && \
- chmod a+x $PAYARA_PATH/generate_deploy_commands.sh
+ chown -R payara:payara ${PAYARA_PATH}/generate_deploy_commands.sh && \
+ chmod a+x ${PAYARA_PATH}/generate_deploy_commands.sh
 USER payara
 
-ENTRYPOINT $PAYARA_PATH/generate_deploy_commands.sh && $PAYARA_PATH/bin/asadmin start-domain -v --postbootcommandfile $DEPLOY_COMMANDS
+ENTRYPOINT ${PAYARA_PATH}/generate_deploy_commands.sh && ${PAYARA_PATH}/bin/asadmin start-domain -v --postbootcommandfile ${DEPLOY_COMMANDS}
