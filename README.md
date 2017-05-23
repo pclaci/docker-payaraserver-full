@@ -92,6 +92,16 @@ However, deploying applications using the autodeployment directory is discourage
  - it requires a writable filesystem, what might be cumbersome when deploying from a mounted directory
  - this functionality is disabled in the `payaradomain` domain for security reasons and has to be enabled before using it with that domain
 
+## Selection of domain
+
+The default entry point starts the server in the `domain1` domain. If you want to start it with a different domain, e.g. `payaradomain`, you may provide the domain name in the `PAYARA_DOMAIN` environment variable. The following would start Payara Server in `payaradomain`, without changing the entry point:
+
+```
+docker run -p 8080:8080 --env PAYARA_DOMAIN=payaradomain payara/server-full
+```
+
+If you also want to use the `AUTODEPLOY_DIR` variable (although this is discouraged), you need to overwrite the value of this variable accordingly. It points to the autodeploy directory of the `domain1` domain by default.
+
 
 # Details
 
