@@ -64,7 +64,7 @@ ENV AUTODEPLOY_DIR ${PAYARA_PATH}/glassfish/domains/${PAYARA_DOMAIN}/autodeploy
 # Default payara ports to expose
 EXPOSE 4848 8009 8080 8181
 
-ENV DEPLOY_COMMANDS=${PAYARA_PATH}/post-boot-commands.asadmin
+ENV POSTBOOT_COMMANDS=${PAYARA_PATH}/post-boot-commands.asadmin
 
 COPY generate_deploy_commands.sh ${PAYARA_PATH}/generate_deploy_commands.sh
 COPY bin/startInForeground.sh ${PAYARA_PATH}/bin/startInForeground.sh
@@ -76,4 +76,4 @@ RUN \
  chmod a+x ${PAYARA_PATH}/bin/startInForeground.sh
 USER payara
 
-ENTRYPOINT ${PAYARA_PATH}/generate_deploy_commands.sh && ${PAYARA_PATH}/bin/startInForeground.sh --postbootcommandfile ${DEPLOY_COMMANDS} ${PAYARA_DOMAIN}
+ENTRYPOINT ${PAYARA_PATH}/generate_deploy_commands.sh && ${PAYARA_PATH}/bin/startInForeground.sh --postbootcommandfile ${POSTBOOT_COMMANDS} ${PAYARA_DOMAIN}
