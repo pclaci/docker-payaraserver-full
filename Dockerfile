@@ -65,7 +65,7 @@ ENV DEPLOY_DIR ${PAYARA_PATH}/deployments
 ENV AUTODEPLOY_DIR ${PAYARA_PATH}/glassfish/domains/${PAYARA_DOMAIN}/autodeploy
 
 # Default payara ports to expose
-EXPOSE 4848 8009 8080 8181
+EXPOSE 4848 9009 8080 8181
 
 ENV POSTBOOT_COMMANDS ${PAYARA_PATH}/post-boot-commands.asadmin
 
