@@ -123,4 +123,4 @@ Payara Server installation is located in the `/opt/payara` directory. This direc
 
 Payara Server is a patched, enhanced and supported application server derived from GlassFish Server Open Source Edition 4.x. Visit [www.payara.fish](http://www.payara.fish) for full 24/7 support and lots of free resources.
 
-Full Payara Server and Payara Micro documentation: [https://payara.gitbooks.io/payara-server/content/](https://payara.gitbooks.io/payara-server/content/)
+Full Payara Server and Payara Micro documentation: [https://docs.payara.fish/](https://docs.payara.fish/)
