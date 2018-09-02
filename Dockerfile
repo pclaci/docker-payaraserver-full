@@ -29,10 +29,10 @@ USER payara
 WORKDIR ${PAYARA_PATH}
 
 # set credentials to admin/admin for both domains
-RUN echo 'AS_ADMIN_PASSWORD=\n\
-AS_ADMIN_NEWPASSWORD='${ADMIN_PASSWORD}'\n\
-EOF\n'\
->> /opt/tmpfile && \
+RUN \
+ echo "AS_ADMIN_PASSWORD=" > /opt/tmpfile && \
+ echo "AS_ADMIN_NEWPASSWORD=${ADMIN_PASSWORD}" >> /opt/tmpfile && \
+ echo "AS_ADMIN_PASSWORD=${ADMIN_PASSWORD}" > /opt/pwdfile && \
 # domain1
  ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/tmpfile change-admin-password && \
  ${PAYARA_PATH}/bin/asadmin start-domain domain1 && \
