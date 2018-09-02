@@ -12,8 +12,6 @@ COPY generate_deploy_commands.sh ${PAYARA_PATH}/generate_deploy_commands.sh
 COPY bin/startInForeground.sh ${PAYARA_PATH}/bin/startInForeground.sh
 
 RUN \
- apt-get update && \
- apt-get install -y unzip && \
  mkdir -p ${PAYARA_PATH}/deployments && \
 # add payara user
  useradd --home-dir ${PAYARA_PATH} -s /bin/bash -d ${PAYARA_PATH} payara && \
@@ -25,9 +23,7 @@ RUN \
  unzip -qq /opt/payara-full.zip -d /opt && \
  chown -R payara:payara /opt && \
  ln -s ${PAYARA_PATH} /opt/payara && \
- rm /opt/payara-full.zip && \
-# delete apt index
- rm -rf /var/lib/apt/lists/*
+ rm /opt/payara-full.zip
 
 USER payara
 WORKDIR ${PAYARA_PATH}
