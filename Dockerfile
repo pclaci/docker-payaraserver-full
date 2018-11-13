@@ -9,6 +9,7 @@ EXPOSE 4848 9009 8080 8181
 
 # Initialize the configurable environment variables
 ENV PAYARA_PATH=/opt/payara\
+    DOMAIN_NAME=docker-domain\
     # Credentials for Payara
     ADMIN_USER=admin\
     ADMIN_PASSWORD=admin \
@@ -35,27 +36,22 @@ RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/
     chown payara:payara payara.zip && \
     unzip -qq payara.zip -d ./ && \
     mv payara*/ appserver && \
-    # Configure the password files for configuring Payara
-    echo "AS_ADMIN_PASSWORD=\nAS_ADMIN_NEWPASSWORD=${ADMIN_PASSWORD}" >> /tmp/tmpFile && \
+    # Configure the password file for configuring Payara
     echo "AS_ADMIN_PASSWORD=${ADMIN_PASSWORD}" >> passwordFile && \
-    # Configure domain1
-    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=/tmp/tmpFile change-admin-password && \
-    appserver/bin/asadmin start-domain domain1 && \
+    # Create and configure a domain
+    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile create-domain --template=appserver/glassfish/common/templates/gf/production-domain.jar ${DOMAIN_NAME} && \
+    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile start-domain ${DOMAIN_NAME} && \
     appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile enable-secure-admin && \
-    appserver/bin/asadmin stop-domain domain1 && \
-    rm -rf appserver/glassfish/domains/domain1/osgi-cache && \
-    # Configure production
-    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=/tmp/tmpFile change-admin-password --domain_name=production && \
-    appserver/bin/asadmin start-domain production && \
-    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile enable-secure-admin && \
-    appserver/bin/asadmin stop-domain production && \
-    rm -rf appserver/glassfish/domains/production/osgi-cache && \
+    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile stop-domain ${DOMAIN_NAME} && \
     # Cleanup unused files
-    rm payara.zip && \
-    rm /tmp/tmpFile
+    rm -rf \
+        payara.zip \
+        appserver/glassfish/domains/production \
+        appserver/glassfish/domains/domain1 \
+        appserver/glassfish/common/templates/gf
 
 # Copy across docker scripts
 COPY --chown=payara:payara bin/*.sh scripts/
 RUN chmod +x scripts/*
 
-ENTRYPOINT ${PAYARA_PATH}/scripts/generate_deploy_commands.sh && ${PAYARA_PATH}/scripts/startInForeground.sh  --passwordfile=/opt/payara/passwordFile --postbootcommandfile ${POSTBOOT_COMMANDS} ${PAYARA_DOMAIN}
+CMD ${PAYARA_PATH}/scripts/generate_deploy_commands.sh && ${PAYARA_PATH}/scripts/startInForeground.sh  --passwordfile=/opt/payara/passwordFile --postbootcommandfile ${POSTBOOT_COMMANDS} ${PAYARA_DOMAIN}

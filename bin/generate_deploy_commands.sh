@@ -28,14 +28,14 @@ touch $POSTBOOT_COMMANDS
 touch $PREBOOT_COMMANDS
 
 # RAR files first
-for deployment in $(find ${PAYARA_PATH}/deployments -name "*.rar");
+for deployment in $(find ${PAYARA_PATH}/deployments/ -name "*.rar");
 do
 	echo "Adding deployment target $deployment to post boot commands";
 	echo "deploy $DEPLOY_OPTS $deployment" >> $POSTBOOT_COMMANDS;
 done
 
 # Then everything else
-for deployment in $(find ${PAYARA_PATH}/deployments -name "*.war" -o -name "*.ear" -o -name "*.jar");
+for deployment in $(find ${PAYARA_PATH}/deployments/ -name "*.war" -o -name "*.ear" -o -name "*.jar");
 do
 	echo "Adding deployment target $deployment to post boot commands";
 	echo "deploy $DEPLOY_OPTS $deployment" >> $POSTBOOT_COMMANDS;
