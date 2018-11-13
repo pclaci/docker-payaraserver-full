@@ -11,7 +11,8 @@ ENV PAYARA_PATH=/opt/payara\
     JVM_ARGS=\
     DEPLOY_PROPS=\
     DEPLOY_DIR=/opt/payara/deployments\
-    POSTBOOT_COMMANDS=/opt/payara/post-boot-commands.asadmin\
+    POSTBOOT_COMMANDS=/opt/payara/scripts/post-boot-commands.asadmin\
+    PREBOOT_COMMANDS=/opt/payara/scripts/pre-boot-commands.asadmin\
     AS_ADMIN_PATH=/opt/payara/appserver/bin/asadmin
 
 # Create and set the Payara user and working directory owned by the new user
@@ -54,9 +55,7 @@ RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/
     rm /tmp/tmpFile
 
 # Copy across docker scripts
-COPY --chown=payara:payara generate_deploy_commands.sh ${PAYARA_PATH}/generate_deploy_commands.sh
-COPY --chown=payara:payara bin/startInForeground.sh ${PAYARA_PATH}/bin/startInForeground.sh
-RUN chmod +x ${PAYARA_PATH}/generate_deploy_commands.sh && \
-    chmod +x ${PAYARA_PATH}/bin/startInForeground.sh
+COPY --chown=payara:payara bin/*.sh scripts/
+RUN chmod +x scripts/*
 
-ENTRYPOINT ${PAYARA_PATH}/generate_deploy_commands.sh && ${PAYARA_PATH}/bin/startInForeground.sh  --passwordfile=/opt/payara/passwordFile --postbootcommandfile ${POSTBOOT_COMMANDS} ${PAYARA_DOMAIN}
+ENTRYPOINT ${PAYARA_PATH}/scripts/generate_deploy_commands.sh && ${PAYARA_PATH}/scripts/startInForeground.sh  --passwordfile=/opt/payara/passwordFile --postbootcommandfile ${POSTBOOT_COMMANDS} ${PAYARA_DOMAIN}

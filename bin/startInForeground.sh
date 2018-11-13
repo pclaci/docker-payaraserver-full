@@ -51,7 +51,7 @@ fi
 COMMAND=`echo "$OUTPUT" | sed -n -e '2,/^$/p'`
 
 echo Executing Payara Server with the following command line:
-echo $COMMAND
+echo $COMMAND | tr ' ' '\n'
 echo
 
 # Run the server in foreground - read master password from variable or file or use the default "changeit" password
@@ -67,5 +67,3 @@ if test "$AS_ADMIN_MASTERPASSWORD"x = x
 fi
 echo "AS_ADMIN_MASTERPASSWORD=$AS_ADMIN_MASTERPASSWORD" > /tmp/masterpwdfile
 exec $COMMAND < /tmp/masterpwdfile
-
-

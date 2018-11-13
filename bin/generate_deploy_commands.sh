@@ -20,11 +20,23 @@
 
 if [ x$1 != x ]
   then
-    DEPLOY_OPTS="$*"
+    DEPLOY_OPTS="$DEPLOY_OPTS $*"
 fi
 
-echo '# deployments after boot' >> $POSTBOOT_COMMANDS
-for deployment in "${DEPLOY_DIR}"/*
-  do
-    echo "deploy --force --enabled=true $DEPLOY_OPTS $deployment" >> $POSTBOOT_COMMANDS
+# Create pre and post boot command files if they don't exist
+touch $POSTBOOT_COMMANDS
+touch $PREBOOT_COMMANDS
+
+# RAR files first
+for deployment in $(find ${PAYARA_PATH}/deployments -name "*.rar");
+do
+	echo "Adding deployment target $deployment to post boot commands";
+	echo "deploy $DEPLOY_OPTS $deployment" >> $POSTBOOT_COMMANDS;
+done
+
+# Then everything else
+for deployment in $(find ${PAYARA_PATH}/deployments -name "*.war" -o -name "*.ear" -o -name "*.jar");
+do
+	echo "Adding deployment target $deployment to post boot commands";
+	echo "deploy $DEPLOY_OPTS $deployment" >> $POSTBOOT_COMMANDS;
 done
