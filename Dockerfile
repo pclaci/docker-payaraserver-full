@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk
+FROM openjdk:8u171-jdk
 
 ENV ADMIN_USER=admin \
 # set credentials to admin/admin
