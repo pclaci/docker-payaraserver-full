@@ -1,55 +1,26 @@
 FROM openjdk:8u171-jdk
 
-ENV ADMIN_USER=admin \
-# set credentials to admin/admin
+# Initialize the configurable environment variables
+ENV PAYARA_PATH=/opt/payara\
+    # Credentials for Payara
+    ADMIN_USER=admin\
     ADMIN_PASSWORD=admin \
-    PAYARA_PATH=/opt/payara5 \
-# specify Payara version to download
-    PAYARA_PKG=https://search.maven.org/remotecontent?filepath=fish/payara/distributions/payara/5.183/payara-5.183.zip \
-    PAYARA_VERSION=5.183
+    # Payara download link
+    PAYARA_PKG=https://search.maven.org/remotecontent?filepath=fish/payara/distributions/payara/5.183/payara-5.183.zip\
+    # Utility environment variables
+    JVM_ARGS=\
+    DEPLOY_PROPS=\
+    DEPLOY_DIR=/opt/payara/deployments\
+    POSTBOOT_COMMANDS=/opt/payara/post-boot-commands.asadmin\
+    AS_ADMIN_PATH=/opt/payara/appserver/bin/asadmin
 
-COPY generate_deploy_commands.sh ${PAYARA_PATH}/generate_deploy_commands.sh
-COPY bin/startInForeground.sh ${PAYARA_PATH}/bin/startInForeground.sh
-
-RUN \
- mkdir -p ${PAYARA_PATH}/deployments && \
-# add payara user
- useradd --home-dir ${PAYARA_PATH} -s /bin/bash -d ${PAYARA_PATH} payara && \
- echo payara:payara | chpasswd && \
- chmod a+x ${PAYARA_PATH}/generate_deploy_commands.sh && \
- chmod a+x ${PAYARA_PATH}/bin/startInForeground.sh && \
-# download Payara Server, install, then remove downloaded file
- wget --no-verbose -O /opt/payara-full.zip ${PAYARA_PKG} && \
- unzip -qq /opt/payara-full.zip -d /opt && \
- chown -R payara:payara /opt && \
- ln -s ${PAYARA_PATH} /opt/payara && \
- rm /opt/payara-full.zip
-
+# Create and set the Payara user and working directory owned by the new user
+RUN groupadd payara && \
+    useradd -b ${PAYARA_PATH} -M -s /bin/bash -d ${PAYARA_PATH} payara -g payara && \
+    mkdir -p ${DEPLOY_DIR} && \
+    chown -R payara:payara ${PAYARA_PATH}
 USER payara
 WORKDIR ${PAYARA_PATH}
-
-# set credentials to admin/admin for both domains
-RUN \
- echo "AS_ADMIN_PASSWORD=" > /opt/tmpfile && \
- echo "AS_ADMIN_NEWPASSWORD=${ADMIN_PASSWORD}" >> /opt/tmpfile && \
- echo "AS_ADMIN_PASSWORD=${ADMIN_PASSWORD}" > /opt/pwdfile && \
-# domain1
- ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/tmpfile change-admin-password && \
- ${PAYARA_PATH}/bin/asadmin start-domain domain1 && \
- ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/pwdfile enable-secure-admin && \
- ${PAYARA_PATH}/bin/asadmin stop-domain domain1 && \
- rm -rf ${PAYARA_PATH}/glassfish/domains/domain1/osgi-cache && \
-# production
- ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/tmpfile change-admin-password --domain_name=production && \
- ${PAYARA_PATH}/bin/asadmin start-domain production && \
- ${PAYARA_PATH}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/opt/pwdfile enable-secure-admin && \
- ${PAYARA_PATH}/bin/asadmin stop-domain production && \
- rm -rf ${PAYARA_PATH}/glassfish/domains/production/osgi-cache && \
- rm /opt/tmpfile
-
-ENV PAYARA_DOMAIN domain1
-ENV DEPLOY_DIR ${PAYARA_PATH}/deployments
-ENV AUTODEPLOY_DIR ${PAYARA_PATH}/glassfish/domains/${PAYARA_DOMAIN}/autodeploy
 
 # Default payara ports to expose
 # 4848: admin console
@@ -58,6 +29,34 @@ ENV AUTODEPLOY_DIR ${PAYARA_PATH}/glassfish/domains/${PAYARA_DOMAIN}/autodeploy
 # 8181: https
 EXPOSE 4848 9009 8080 8181
 
-ENV POSTBOOT_COMMANDS ${PAYARA_PATH}/post-boot-commands.asadmin
+# Download and unzip the Payara distribution
+RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/distributions/payara/5.183/payara-5.183.zip && \
+    chown payara:payara payara.zip && \
+    unzip -qq payara.zip -d ./ && \
+    mv payara*/ appserver && \
+    # Configure the password files for configuring Payara
+    echo "AS_ADMIN_PASSWORD=\nAS_ADMIN_NEWPASSWORD=${ADMIN_PASSWORD}" >> /tmp/tmpFile && \
+    echo "AS_ADMIN_PASSWORD=${ADMIN_PASSWORD}" >> passwordFile && \
+    # Configure domain1
+    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=/tmp/tmpFile change-admin-password && \
+    appserver/bin/asadmin start-domain domain1 && \
+    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile enable-secure-admin && \
+    appserver/bin/asadmin stop-domain domain1 && \
+    rm -rf appserver/glassfish/domains/domain1/osgi-cache && \
+    # Configure production
+    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=/tmp/tmpFile change-admin-password --domain_name=production && \
+    appserver/bin/asadmin start-domain production && \
+    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile enable-secure-admin && \
+    appserver/bin/asadmin stop-domain production && \
+    rm -rf appserver/glassfish/domains/production/osgi-cache && \
+    # Cleanup unused files
+    rm payara.zip && \
+    rm /tmp/tmpFile
 
-ENTRYPOINT ${PAYARA_PATH}/generate_deploy_commands.sh && ${PAYARA_PATH}/bin/startInForeground.sh  --passwordfile=/opt/pwdfile --postbootcommandfile ${POSTBOOT_COMMANDS} ${PAYARA_DOMAIN}
+# Copy across docker scripts
+COPY --chown=payara:payara generate_deploy_commands.sh ${PAYARA_PATH}/generate_deploy_commands.sh
+COPY --chown=payara:payara bin/startInForeground.sh ${PAYARA_PATH}/bin/startInForeground.sh
+RUN chmod +x ${PAYARA_PATH}/generate_deploy_commands.sh && \
+    chmod +x ${PAYARA_PATH}/bin/startInForeground.sh
+
+ENTRYPOINT ${PAYARA_PATH}/generate_deploy_commands.sh && ${PAYARA_PATH}/bin/startInForeground.sh  --passwordfile=/opt/payara/passwordFile --postbootcommandfile ${POSTBOOT_COMMANDS} ${PAYARA_DOMAIN}
