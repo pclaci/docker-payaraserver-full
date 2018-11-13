@@ -1,5 +1,12 @@
 FROM openjdk:8u171-jdk
 
+# Default payara ports to expose
+# 4848: admin console
+# 9009: debug port (JPDA)
+# 8080: http
+# 8181: https
+EXPOSE 4848 9009 8080 8181
+
 # Initialize the configurable environment variables
 ENV PAYARA_PATH=/opt/payara\
     # Credentials for Payara
@@ -22,13 +29,6 @@ RUN groupadd payara && \
     chown -R payara:payara ${PAYARA_PATH}
 USER payara
 WORKDIR ${PAYARA_PATH}
-
-# Default payara ports to expose
-# 4848: admin console
-# 9009: debug port (JPDA)
-# 8080: http
-# 8181: https
-EXPOSE 4848 9009 8080 8181
 
 # Download and unzip the Payara distribution
 RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/distributions/payara/5.183/payara-5.183.zip && \
