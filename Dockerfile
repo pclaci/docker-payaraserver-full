@@ -46,6 +46,7 @@ RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/
     # Cleanup unused files
     rm -rf \
         payara.zip \
+        appserver/glassfish/domains/${DOMAIN_NAME}/osgi-cache \
         appserver/glassfish/domains/production \
         appserver/glassfish/domains/domain1 \
         appserver/glassfish/common/templates/gf
