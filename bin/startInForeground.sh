@@ -35,7 +35,7 @@
 touch $POSTBOOT_COMMANDS
 touch $PREBOOT_COMMANDS
 
-OUTPUT=`~/appserver/bin/asadmin start-domain --user $ADMIN_USER --passwordfile="/opt/payara/passwordFile" --dry-run --prebootcommandfile=$PREBOOT_COMMANDS --postbootcommandfile $POSTBOOT_COMMANDS $@ $DOMAIN_NAME`
+OUTPUT=`~/appserver/bin/asadmin --user $ADMIN_USER --passwordfile="/opt/payara/passwordFile" start-domain --dry-run --prebootcommandfile=$PREBOOT_COMMANDS --postbootcommandfile $POSTBOOT_COMMANDS $@ $DOMAIN_NAME`
 STATUS=$?
 if [ "$STATUS" -ne 0 ]
   then
