@@ -14,7 +14,7 @@ ENV PAYARA_PATH=/opt/payara\
     ADMIN_USER=admin\
     ADMIN_PASSWORD=admin \
     # Payara download link
-    PAYARA_PKG=https://search.maven.org/remotecontent?filepath=fish/payara/distributions/payara/5.183/payara-5.183.zip\
+    PAYARA_PKG=http://central.maven.org/maven2/fish/payara/distributions/payara/5.183/payara-5.183.zip\
     # Utility environment variables
     JVM_ARGS=\
     DEPLOY_PROPS=\
