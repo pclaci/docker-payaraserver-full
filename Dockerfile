@@ -32,7 +32,7 @@ USER payara
 WORKDIR ${PAYARA_PATH}
 
 # Download and unzip the Payara distribution
-RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/distributions/payara/5.183/payara-5.183.zip && \
+RUN wget --no-verbose -O payara.zip ${PAYARA_PKG} && \
     chown payara:payara payara.zip && \
     unzip -qq payara.zip -d ./ && \
     mv payara*/ appserver && \
@@ -42,11 +42,13 @@ RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/
     appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile create-domain --template=appserver/glassfish/common/templates/gf/production-domain.jar ${DOMAIN_NAME} && \
     appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile start-domain ${DOMAIN_NAME} && \
     appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile enable-secure-admin && \
+    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.logtoFile=false && \
     appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile stop-domain ${DOMAIN_NAME} && \
     # Cleanup unused files
     rm -rf \
         payara.zip \
         appserver/glassfish/domains/${DOMAIN_NAME}/osgi-cache \
+        appserver/glassfish/domains/${DOMAIN_NAME}/logs \
         appserver/glassfish/domains/production \
         appserver/glassfish/domains/domain1 \
         appserver/glassfish/common/templates/gf
