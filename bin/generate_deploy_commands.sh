@@ -24,6 +24,11 @@
 # a single application exists in the $DEPLOY_DIR directory.
 ################################################################################
 
+# Check required variables are set
+if [ -z $DEPLOY_DIR ]; then echo "Variable DEPLOY_DIR is not set."; exit 1; fi
+if [ -z $PREBOOT_COMMANDS ]; then echo "Variable PREBOOT_COMMANDS is not set."; exit 1; fi
+if [ -z $POSTBOOT_COMMANDS ]; then echo "Variable POSTBOOT_COMMANDS is not set."; exit 1; fi
+
 # Create pre and post boot command files if they don't exist
 touch $POSTBOOT_COMMANDS
 touch $PREBOOT_COMMANDS
@@ -45,13 +50,13 @@ deploy() {
 }
 
 # RAR files first
-for deployment in $(find ${PAYARA_PATH}/deployments/ -mindepth 1 -maxdepth 1 -name "*.rar");
+for deployment in $(find $DEPLOY_DIR -mindepth 1 -maxdepth 1 -name "*.rar");
 do
 	deploy $deployment;
 done
 
 # Then every other WAR, EAR, JAR or directory
-for deployment in $(find ${PAYARA_PATH}/deployments/ -mindepth 1 -maxdepth 1 ! -name "*.rar" -a -name "*.war" -o -name "*.ear" -o -name "*.jar" -o -type d);
+for deployment in $(find $DEPLOY_DIR -mindepth 1 -maxdepth 1 ! -name "*.rar" -a -name "*.war" -o -name "*.ear" -o -name "*.jar" -o -type d);
 do
 	deploy $deployment;
 done

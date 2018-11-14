@@ -25,6 +25,13 @@
 #
 ##########################################################################################################
 
+# Check required variables are set
+if [ -z $ADMIN_USER ]; then echo "Variable ADMIN_USER is not set."; exit 1; fi
+if [ -z $PASSWORD_FILE ]; then echo "Variable PASSWORD_FILE is not set."; exit 1; fi
+if [ -z $PREBOOT_COMMANDS ]; then echo "Variable PREBOOT_COMMANDS is not set."; exit 1; fi
+if [ -z $POSTBOOT_COMMANDS ]; then echo "Variable POSTBOOT_COMMANDS is not set."; exit 1; fi
+if [ -z $DOMAIN_NAME ]; then echo "Variable DOMAIN_NAME is not set."; exit 1; fi
+
 # The following command gets the command line to be executed by start-domain
 # - print the command line to the server with --dry-run, each argument on a separate line
 # - remove -read-string argument
@@ -35,7 +42,7 @@
 touch $POSTBOOT_COMMANDS
 touch $PREBOOT_COMMANDS
 
-OUTPUT=`~/appserver/bin/asadmin --user $ADMIN_USER --passwordfile="/opt/payara/passwordFile" start-domain --dry-run --prebootcommandfile=$PREBOOT_COMMANDS --postbootcommandfile $POSTBOOT_COMMANDS $@ $DOMAIN_NAME`
+OUTPUT=`${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} start-domain --dry-run --prebootcommandfile=${PREBOOT_COMMANDS} --postbootcommandfile=${POSTBOOT_COMMANDS} $@ $DOMAIN_NAME`
 STATUS=$?
 if [ "$STATUS" -ne 0 ]
   then
@@ -63,4 +70,4 @@ if test "$AS_ADMIN_MASTERPASSWORD"x = x
     AS_ADMIN_MASTERPASSWORD=changeit
 fi
 echo "AS_ADMIN_MASTERPASSWORD=$AS_ADMIN_MASTERPASSWORD" > /tmp/masterpwdfile
-exec $COMMAND < /tmp/masterpwdfile
+exec ${COMMAND} < /tmp/masterpwdfile
