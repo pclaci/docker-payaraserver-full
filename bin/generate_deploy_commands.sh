@@ -40,7 +40,7 @@ deploy() {
 		exit 1;
 	fi
 
-	DEPLOY_STATEMENT="deploy $DEPLOY_OPTS $1"
+	DEPLOY_STATEMENT="deploy $DEPLOY_PROPS $1"
 	if grep -q $1 $POSTBOOT_COMMANDS; then
 		echo "post boot commands already deploys $1";
 	else
