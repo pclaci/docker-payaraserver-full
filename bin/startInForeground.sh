@@ -12,27 +12,18 @@
 #
 # It's possible to use any arguments of the start-domain command as arguments to startInForeground.sh
 #
-# If the first argument to this script starts with --passwordfile= it should specify the path to the 
-# password file that contains the master password. Passwodfile can be also set using PASSWORD_FILE 
-# environment variable. Alternatively, master password can be set using AS_ADMIN_MASTERPASSWORD environment 
-# variable.
+# Environment variables used:
+#   - $ADMIN_USER - the username to use for the asadmin utility.
+#   - $PASSWORD_FILE - the password file to use for the asadmin utility.
+#   - $PREBOOT_COMMANDS - the pre boot command file.
+#   - $POSTBOOT_COMMANDS - the post boot command file.
+#   - $DOMAIN_NAME - the name of the domain to start.
+#   - $JVM_ARGS - extra JVM options to pass to the Payara Server instance.
+#   - $AS_ADMIN_MASTERPASSWORD - the master password for the Payara Server instance.
 #
-# By default, this script executes the asadmin tool which is found in the same directory. 
-# The AS_ADMIN_PATH environment variable can be used to specify an alternative path to the asadmin tool.
+# This script executes the asadmin tool which is expected at ~/appserver/bin/asadmin.
 #
 ##########################################################################################################
-
-if [ -z "$AS_ADMIN_PATH" ]
-  then
-    AS_ADMIN_PATH=`dirname $0`/asadmin
-fi
-
-if echo "$1" | grep -e '--passwordfile=' > /dev/null
-  then
-    PASSWORD_FILE=`echo "$1" | sed 's/--passwordfile=//'`
-    PASSWORD_FILE_ARG="$1"
-    shift 1
-fi
 
 # The following command gets the command line to be executed by start-domain
 # - print the command line to the server with --dry-run, each argument on a separate line
@@ -40,7 +31,11 @@ fi
 # - surround each line except with parenthesis to allow spaces in paths
 # - remove lines before and after the command line and squash commands on a single line
 
-OUTPUT=`"$AS_ADMIN_PATH" start-domain "$PASSWORD_FILE_ARG" --dry-run "$@"`
+# Create pre and post boot command files if they don't exist
+touch $POSTBOOT_COMMANDS
+touch $PREBOOT_COMMANDS
+
+OUTPUT=`~/appserver/bin/asadmin start-domain --passwordfile="/opt/payara/passwordFile" --dry-run --prebootcommandfile=$PREBOOT_COMMANDS --postbootcommandfile $POSTBOOT_COMMANDS $@ $DOMAIN_NAME`
 STATUS=$?
 if [ "$STATUS" -ne 0 ]
   then
