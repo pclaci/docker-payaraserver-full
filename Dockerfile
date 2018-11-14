@@ -29,6 +29,7 @@ ENV HOME_DIR=/opt/payara\
 # Create and set the Payara user and working directory owned by the new user
 RUN groupadd payara && \
     useradd -b ${HOME_DIR} -M -s /bin/bash -d ${HOME_DIR} payara -g payara && \
+    echo payara:payara | chpasswd && \
     mkdir -p ${DEPLOY_DIR} && \
     mkdir -p ${CONFIG_DIR} && \
     mkdir -p ${SCRIPT_DIR} && \
