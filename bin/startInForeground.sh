@@ -35,7 +35,7 @@
 touch $POSTBOOT_COMMANDS
 touch $PREBOOT_COMMANDS
 
-OUTPUT=`~/appserver/bin/asadmin start-domain --passwordfile="/opt/payara/passwordFile" --dry-run --prebootcommandfile=$PREBOOT_COMMANDS --postbootcommandfile $POSTBOOT_COMMANDS $@ $DOMAIN_NAME`
+OUTPUT=`~/appserver/bin/asadmin start-domain --user $ADMIN_USER --passwordfile="/opt/payara/passwordFile" --dry-run --prebootcommandfile=$PREBOOT_COMMANDS --postbootcommandfile $POSTBOOT_COMMANDS $@ $DOMAIN_NAME`
 STATUS=$?
 if [ "$STATUS" -ne 0 ]
   then
@@ -43,7 +43,9 @@ if [ "$STATUS" -ne 0 ]
     exit 1
 fi
 
-COMMAND=`echo "$OUTPUT" | sed -n -e '2,/^$/p'`
+COMMAND=`echo "$OUTPUT"\
+ | sed -n -e '2,/^$/p'\
+ | sed 's/glassfish.jar/glassfish.jar '"$JVM_ARGS"'/' `
 
 echo Executing Payara Server with the following command line:
 echo $COMMAND | tr ' ' '\n'
