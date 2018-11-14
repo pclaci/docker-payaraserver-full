@@ -42,6 +42,10 @@ RUN wget --no-verbose -O payara.zip ${PAYARA_PKG} && \
     appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile create-domain --template=appserver/glassfish/common/templates/gf/production-domain.jar ${DOMAIN_NAME} && \
     appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile start-domain ${DOMAIN_NAME} && \
     appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile enable-secure-admin && \
+    for MEMORY_JVM_OPTION in $(appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile list-jvm-options | grep "Xm[sx]"); do\
+        appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile delete-jvm-options $MEMORY_JVM_OPTION;\
+    done && \
+    appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile create-jvm-options '-XX\:+UnlockExperimentalVMOptions:-XX\:+UseCGroupMemoryLimitForHeap' && \
     appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.logtoFile=false && \
     appserver/bin/asadmin --user=${ADMIN_USER} --passwordfile=passwordFile stop-domain ${DOMAIN_NAME} && \
     # Cleanup unused files
