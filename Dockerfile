@@ -17,7 +17,7 @@ ENV HOME_DIR=/opt/payara\
     # Payara version
     PAYARA_VERSION=5.183\
     # Payara Server Domain options
-    DOMAIN_NAME=docker-domain\
+    DOMAIN_NAME=production\
     ADMIN_USER=admin\
     ADMIN_PASSWORD=admin \
     # Utility environment variables
@@ -42,9 +42,10 @@ RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/
     unzip -qq payara.zip -d ./ && \
     mv payara*/ appserver && \
     # Configure the password file for configuring Payara
+    echo "AS_ADMIN_PASSWORD=\nAS_ADMIN_NEWPASSWORD=${ADMIN_PASSWORD}" > /tmp/tmpfile && \	
     echo "AS_ADMIN_PASSWORD=${ADMIN_PASSWORD}" >> ${PASSWORD_FILE} && \
-    # Create and configure a domain
-    ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} create-domain --template=${PAYARA_DIR}/glassfish/common/templates/gf/production-domain.jar ${DOMAIN_NAME} && \
+    # Configure the payara domain
+    ${PAYARA_DIR}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/tmp/tmpfile change-admin-password --domain_name=${DOMAIN_NAME} && \
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} start-domain ${DOMAIN_NAME} && \
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} enable-secure-admin && \
     for MEMORY_JVM_OPTION in $(${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} list-jvm-options | grep "Xm[sx]"); do\
@@ -55,10 +56,10 @@ RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} stop-domain ${DOMAIN_NAME} && \
     # Cleanup unused files
     rm -rf \
+        /tmp/tmpFile \
         payara.zip \
         ${PAYARA_DIR}/glassfish/domains/${DOMAIN_NAME}/osgi-cache \
         ${PAYARA_DIR}/glassfish/domains/${DOMAIN_NAME}/logs \
-        ${PAYARA_DIR}/glassfish/domains/production \
         ${PAYARA_DIR}/glassfish/domains/domain1
 
 # Copy across docker scripts

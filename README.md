@@ -18,7 +18,7 @@ To boot the default domain with HTTP listener exported on port 8080:
 docker run -p 8080:8080 payara/server-full
 ```
 
-The Docker container specifies the default entry point, which starts a custom domain `docker-domain` in foreground so that Payara Server becomes the main process.
+The Docker container specifies the default entry point, which starts a custom domain `production` in foreground so that Payara Server becomes the main process.
 
 ## Open ports
 
