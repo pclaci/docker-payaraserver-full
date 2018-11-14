@@ -57,4 +57,4 @@ RUN wget --no-verbose -O payara.zip ${PAYARA_PKG} && \
 COPY --chown=payara:payara bin/*.sh scripts/
 RUN chmod +x scripts/*
 
-CMD ${PAYARA_PATH}/scripts/generate_deploy_commands.sh && ${PAYARA_PATH}/scripts/startInForeground.sh  --passwordfile=/opt/payara/passwordFile --postbootcommandfile ${POSTBOOT_COMMANDS} ${PAYARA_DOMAIN}
+CMD ${PAYARA_PATH}/scripts/generate_deploy_commands.sh && ${PAYARA_PATH}/scripts/startInForeground.sh

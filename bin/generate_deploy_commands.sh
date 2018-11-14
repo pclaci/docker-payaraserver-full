@@ -15,6 +15,10 @@
 #
 # ./generate_deploy_commands.sh --properties=implicitCdiEnabled=false
 #
+# Environment variables used:
+#   - $PREBOOT_COMMANDS - the pre boot command file.
+#   - $POSTBOOT_COMMANDS - the post boot command file.
+#
 # Note that many parameters to the deploy command can be safely used only when 
 # a single application exists in the $DEPLOY_DIR directory.
 ################################################################################
