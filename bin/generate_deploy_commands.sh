@@ -23,16 +23,30 @@
 touch $POSTBOOT_COMMANDS
 touch $PREBOOT_COMMANDS
 
+deploy() {
+
+	if [ -z $1 ]; then
+		echo "No deployment specified";
+		exit 1;
+	fi
+
+	DEPLOY_STATEMENT="deploy $DEPLOY_OPTS $1"
+	if grep -q $1 $POSTBOOT_COMMANDS; then
+		echo "post boot commands already deploys $1";
+	else
+		echo "Adding deployment target $1 to post boot commands";
+		echo $DEPLOY_STATEMENT >> $POSTBOOT_COMMANDS;
+	fi
+}
+
 # RAR files first
 for deployment in $(find ${PAYARA_PATH}/deployments/ -mindepth 1 -maxdepth 1 -name "*.rar");
 do
-	echo "Adding deployment target $deployment to post boot commands";
-	echo "deploy $DEPLOY_OPTS $deployment" >> $POSTBOOT_COMMANDS;
+	deploy $deployment;
 done
 
 # Then every other WAR, EAR, JAR or directory
 for deployment in $(find ${PAYARA_PATH}/deployments/ -mindepth 1 -maxdepth 1 ! -name "*.rar" -a -name "*.war" -o -name "*.ear" -o -name "*.jar" -o -type d);
 do
-	echo "Adding deployment target $deployment to post boot commands";
-	echo "deploy $DEPLOY_OPTS $deployment" >> $POSTBOOT_COMMANDS;
+	deploy $deployment;
 done
