@@ -14,7 +14,7 @@ ENV HOME_DIR=/opt/payara\
     CONFIG_DIR=/opt/payara/config\
     DEPLOY_DIR=/opt/payara/deployments\
     PASSWORD_FILE=/opt/payara/passwordFile\
-    # Payara version
+    # Payara version (5.183+)
     PAYARA_VERSION=5.183\
     # Payara Server Domain options
     DOMAIN_NAME=production\
