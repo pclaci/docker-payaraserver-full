@@ -18,15 +18,15 @@ ENV PAYARA_PATH=/opt/payara\
     # Utility environment variables
     JVM_ARGS=\
     DEPLOY_PROPS=\
-    DEPLOY_DIR=/opt/payara/deployments\
-    POSTBOOT_COMMANDS=/opt/payara/scripts/post-boot-commands.asadmin\
-    PREBOOT_COMMANDS=/opt/payara/scripts/pre-boot-commands.asadmin\
-    AS_ADMIN_PATH=/opt/payara/appserver/bin/asadmin
+    POSTBOOT_COMMANDS=/opt/payara/config/post-boot-commands.asadmin\
+    PREBOOT_COMMANDS=/opt/payara/config/pre-boot-commands.asadmin
 
 # Create and set the Payara user and working directory owned by the new user
 RUN groupadd payara && \
     useradd -b ${PAYARA_PATH} -M -s /bin/bash -d ${PAYARA_PATH} payara -g payara && \
-    mkdir -p ${DEPLOY_DIR} && \
+    mkdir -p ${PAYARA_PATH}/deployments && \
+    mkdir -p ${PAYARA_PATH}/config && \
+    mkdir -p ${PAYARA_PATH}/scripts && \
     chown -R payara:payara ${PAYARA_PATH}
 USER payara
 WORKDIR ${PAYARA_PATH}
