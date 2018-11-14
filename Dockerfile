@@ -59,8 +59,7 @@ RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/
         ${PAYARA_DIR}/glassfish/domains/${DOMAIN_NAME}/osgi-cache \
         ${PAYARA_DIR}/glassfish/domains/${DOMAIN_NAME}/logs \
         ${PAYARA_DIR}/glassfish/domains/production \
-        ${PAYARA_DIR}/glassfish/domains/domain1 \
-        ${PAYARA_DIR}/glassfish/common/templates/gf
+        ${PAYARA_DIR}/glassfish/domains/domain1
 
 # Copy across docker scripts
 COPY --chown=payara:payara bin/*.sh ${SCRIPT_DIR}/
