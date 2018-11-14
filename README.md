@@ -104,6 +104,7 @@ The following environment variables are available to be used. When edited either
 - `DEPLOY_PROPS` - Specifies a list of properties to be passed with the deploy commands generated in the `generate_deploy_commands.sh` script, For example `'--properties=implicitCdiEnabled=false'`.
 - `POSTBOOT_COMMANDS` - The name of the file containing post boot commands for the Payara Server instance. This is the file written to in the `generate_deploy_commands.sh` script.
 - `PREBOOT_COMMANDS` - The name of the file containing pre boot commands for the Payara Server instance.
+- `AS_ADMIN_MASTERPASSWORD` - The master password to pass to Payara Server. This is overriden if one is specified in the `$PASSWORD_FILE`.
 
 The following environment variables shouldn't be changed, but may be helpful in your Dockerfile.
 
