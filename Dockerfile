@@ -67,4 +67,4 @@ RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/
 COPY --chown=payara:payara bin/*.sh ${SCRIPT_DIR}/
 RUN chmod +x ${SCRIPT_DIR}/*
 
-CMD ${SCRIPT_DIR}/generate_deploy_commands.sh && ${SCRIPT_DIR}/startInForeground.sh
+CMD ${SCRIPT_DIR}/generate_deploy_commands.sh && exec ${SCRIPT_DIR}/startInForeground.sh
