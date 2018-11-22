@@ -9,7 +9,8 @@ EXPOSE 4848 9009 8080 8181
 
 # Payara version (5.183+)
 ARG PAYARA_VERSION=5.183
-ARG PAYARA_PKG=http://central.maven.org/maven2/fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip
+ARG PAYARA_PKG=https://search.maven.org/remotecontent?filepath=fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip
+ARG PAYARA_SHA1=c01cbfe8696a6b33bfeb255b20d338e1f423cc02
 ARG TINI_VERSION=v0.18.0
 
 # Initialize the configurable environment variables
@@ -48,6 +49,7 @@ WORKDIR ${HOME_DIR}
 
 # Download and unzip the Payara distribution
 RUN wget --no-verbose -O payara.zip ${PAYARA_PKG} && \
+    echo "${PAYARA_SHA1} *payara.zip" | sha1sum -c - && \
     unzip -qq payara.zip -d ./ && \
     mv payara*/ appserver && \
     # Configure the password file for configuring Payara
