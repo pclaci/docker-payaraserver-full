@@ -7,6 +7,10 @@ FROM openjdk:8u171-jdk
 # 8181: https
 EXPOSE 4848 9009 8080 8181
 
+# Payara version (5.183+)
+ARG PAYARA_VERSION=5.183
+ARG PAYARA_PKG=http://central.maven.org/maven2/fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip
+
 # Initialize the configurable environment variables
 ENV HOME_DIR=/opt/payara\
     PAYARA_DIR=/opt/payara/appserver\
@@ -14,8 +18,6 @@ ENV HOME_DIR=/opt/payara\
     CONFIG_DIR=/opt/payara/config\
     DEPLOY_DIR=/opt/payara/deployments\
     PASSWORD_FILE=/opt/payara/passwordFile\
-    # Payara version (5.183+)
-    PAYARA_VERSION=5.183\
     # Payara Server Domain options
     DOMAIN_NAME=production\
     ADMIN_USER=admin\
@@ -39,7 +41,7 @@ USER payara
 WORKDIR ${HOME_DIR}
 
 # Download and unzip the Payara distribution
-RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip && \
+RUN wget --no-verbose -O payara.zip ${PAYARA_PKG} && \
     unzip -qq payara.zip -d ./ && \
     mv payara*/ appserver && \
     # Configure the password file for configuring Payara
