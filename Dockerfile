@@ -40,7 +40,6 @@ WORKDIR ${HOME_DIR}
 
 # Download and unzip the Payara distribution
 RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip && \
-    chown payara:payara payara.zip && \
     unzip -qq payara.zip -d ./ && \
     mv payara*/ appserver && \
     # Configure the password file for configuring Payara
