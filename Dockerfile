@@ -10,6 +10,7 @@ EXPOSE 4848 9009 8080 8181
 # Payara version (5.183+)
 ARG PAYARA_VERSION=5.183
 ARG PAYARA_PKG=http://central.maven.org/maven2/fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip
+ARG TINI_VERSION=v0.18.0
 
 # Initialize the configurable environment variables
 ENV HOME_DIR=/opt/payara\
@@ -37,6 +38,11 @@ RUN groupadd -g 1000 payara && \
     mkdir -p ${CONFIG_DIR} && \
     mkdir -p ${SCRIPT_DIR} && \
     chown -R payara: ${HOME_DIR}
+
+# Install tini as minimized init system
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
 USER payara
 WORKDIR ${HOME_DIR}
 
@@ -70,4 +76,5 @@ RUN wget --no-verbose -O payara.zip ${PAYARA_PKG} && \
 COPY --chown=payara:payara bin/*.sh ${SCRIPT_DIR}/
 RUN chmod +x ${SCRIPT_DIR}/*
 
-CMD ${SCRIPT_DIR}/generate_deploy_commands.sh && exec ${SCRIPT_DIR}/startInForeground.sh
+ENTRYPOINT ["/tini", "--"]
+CMD ["scripts/entrypoint.sh"]
