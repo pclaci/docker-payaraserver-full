@@ -25,6 +25,7 @@ ENV HOME_DIR=/opt/payara\
     DEPLOY_PROPS=\
     POSTBOOT_COMMANDS=/opt/payara/config/post-boot-commands.asadmin\
     PREBOOT_COMMANDS=/opt/payara/config/pre-boot-commands.asadmin
+ENV PATH="${PATH}:${PAYARA_DIR}/bin"
 
 # Create and set the Payara user and working directory owned by the new user
 RUN groupadd payara && \
@@ -43,7 +44,7 @@ RUN wget --no-verbose -O payara.zip http://central.maven.org/maven2/fish/payara/
     unzip -qq payara.zip -d ./ && \
     mv payara*/ appserver && \
     # Configure the password file for configuring Payara
-    echo "AS_ADMIN_PASSWORD=\nAS_ADMIN_NEWPASSWORD=${ADMIN_PASSWORD}" > /tmp/tmpfile && \	
+    echo "AS_ADMIN_PASSWORD=\nAS_ADMIN_NEWPASSWORD=${ADMIN_PASSWORD}" > /tmp/tmpfile && \
     echo "AS_ADMIN_PASSWORD=${ADMIN_PASSWORD}" >> ${PASSWORD_FILE} && \
     # Configure the payara domain
     ${PAYARA_DIR}/bin/asadmin --user ${ADMIN_USER} --passwordfile=/tmp/tmpfile change-admin-password --domain_name=${DOMAIN_NAME} && \
