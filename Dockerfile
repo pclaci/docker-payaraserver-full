@@ -79,7 +79,8 @@ RUN wget --no-verbose -O payara.zip ${PAYARA_PKG} && \
 
 # Copy across docker scripts
 COPY --chown=payara:payara bin/*.sh ${SCRIPT_DIR}/
-RUN chmod +x ${SCRIPT_DIR}/*
+RUN mkdir -p ${SCRIPT_DIR}/init.d && \
+    chmod +x ${SCRIPT_DIR}/*
 
 ENTRYPOINT ["/tini", "--"]
 CMD ["scripts/entrypoint.sh"]

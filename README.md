@@ -104,6 +104,10 @@ It's possible to run a custom set of asadmin commands either by specifying the `
 
 In cases this is not sufficient, you can add your own init scripts to the `${SCRIPT_DIR}`. You need to follow the naming convention: `init_<num>_<text>.sh`, where `<num>` gives you a simple option to run scripts in order. Be aware that the default deploy commands script is using this, too.
 
+If you do not want to create a sub-image, you can also mount a volume to `/opt/payara/scripts/init.d` and each `*.sh` file in there will be executed in standard file order.
+
+**Please note:** you can combine both approaches, but please keep in mind that scripts from `init.d` will run *after* those from subimages!
+
 ## Environment Variables
 
 The following environment variables are available to be used. When edited either in a `Dockerfile` or before the `startInForeground.sh` script is ran, they will change the behaviour of the Payara Server instance.
