@@ -8,9 +8,9 @@ FROM openjdk:8u171-jdk
 EXPOSE 4848 9009 8080 8181
 
 # Payara version (5.183+)
-ARG PAYARA_VERSION=5.183
+ARG PAYARA_VERSION=5.184
 ARG PAYARA_PKG=https://search.maven.org/remotecontent?filepath=fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip
-ARG PAYARA_SHA1=c01cbfe8696a6b33bfeb255b20d338e1f423cc02
+ARG PAYARA_SHA1=8280306d0fbe96e4223f768dd6f9d631507ee5a0
 ARG TINI_VERSION=v0.18.0
 
 # Initialize the configurable environment variables
