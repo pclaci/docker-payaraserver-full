@@ -26,6 +26,7 @@ ENV HOME_DIR=/opt/payara\
     ADMIN_PASSWORD=admin \
     # Utility environment variables
     JVM_ARGS=\
+    PAYARA_ARGS=\
     DEPLOY_PROPS=\
     POSTBOOT_COMMANDS=/opt/payara/config/post-boot-commands.asadmin\
     PREBOOT_COMMANDS=/opt/payara/config/pre-boot-commands.asadmin
