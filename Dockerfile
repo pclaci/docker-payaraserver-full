@@ -10,7 +10,7 @@ EXPOSE 4848 9009 8080 8181
 # Payara version (5.183+)
 ARG PAYARA_VERSION=5.193
 ARG PAYARA_PKG=https://search.maven.org/remotecontent?filepath=fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip
-ARG PAYARA_SHA1=710707f9a93b7313fb72ab4b409d5655287480c6
+ARG PAYARA_SHA1=1ae9ce3804620c0de9cf68acb230d08f0cdd7324
 ARG TINI_VERSION=v0.18.0
 
 # Initialize the configurable environment variables
