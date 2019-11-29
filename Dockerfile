@@ -8,7 +8,7 @@ FROM azul/zulu-openjdk:8u222
 EXPOSE 4848 9009 8080 8181
 
 # Payara version (5.183+)
-ARG PAYARA_VERSION=5.193.1
+ARG PAYARA_VERSION=5.194
 ARG PAYARA_PKG=https://search.maven.org/remotecontent?filepath=fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip
 ARG PAYARA_SHA1=b01e7621b1b31185fdf32892a1bd76aa72e990f4
 ARG TINI_VERSION=v0.18.0
