@@ -88,4 +88,4 @@ RUN mkdir -p ${SCRIPT_DIR}/init.d && \
     chmod +x ${SCRIPT_DIR}/*
 
 ENTRYPOINT ["/tini", "--"]
-CMD ["scripts/entrypoint.sh"]
+CMD ${SCRIPT_DIR}/entrypoint.sh
