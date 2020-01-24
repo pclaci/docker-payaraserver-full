@@ -78,7 +78,7 @@ If admin port is exposed, it is possible to deploy applications remotely, outsid
 
 ### Environment Variables
 
-The following environment variables are available to confgiure Payara Server. When edited either in a `Dockerfile` or before the `startInForeground.sh` script is ran, they will change the behaviour of the Payara Server instance.
+The following environment variables are available to configure Payara Server. When edited either in a `Dockerfile` or before the `startInForeground.sh` script is ran, they will change the behaviour of the Payara Server instance.
 
 - `JVM_ARGS` - Specifies a list of JVM arguments which will be passed to Payara in the `startInForeground.sh` script.
 - `DEPLOY_PROPS` - Specifies a list of properties to be passed with the deploy commands generated in the `generate_deploy_commands.sh` script, For example `'--properties=implicitCdiEnabled=false'`.
