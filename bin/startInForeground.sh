@@ -52,7 +52,7 @@ fi
 
 COMMAND=`echo "$OUTPUT"\
  | sed -n -e '2,/^$/p'\
- | sed 's/glassfish.jar/glassfish.jar '"$JVM_ARGS"'/' `
+ | sed "s|glassfish.jar|glassfish.jar $JVM_ARGS |g"`
 
 echo Executing Payara Server with the following command line:
 echo $COMMAND | tr ' ' '\n'

@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk:8u212
+FROM azul/zulu-openjdk:8u222
 
 # Default payara ports to expose
 # 4848: admin console
@@ -8,9 +8,9 @@ FROM azul/zulu-openjdk:8u212
 EXPOSE 4848 9009 8080 8181
 
 # Payara version (5.183+)
-ARG PAYARA_VERSION=5.193.1
+ARG PAYARA_VERSION=5.194
 ARG PAYARA_PKG=https://search.maven.org/remotecontent?filepath=fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip
-ARG PAYARA_SHA1=b01e7621b1b31185fdf32892a1bd76aa72e990f4
+ARG PAYARA_SHA1=ff13ccd3e7905e7cc54b574b8c44341352800961
 ARG TINI_VERSION=v0.18.0
 
 # Initialize the configurable environment variables
@@ -72,8 +72,7 @@ RUN wget --no-verbose -O payara.zip ${PAYARA_PKG} && \
     done && \
     # FIXME: when upgrading this container to Java 10+, this needs to be changed to '-XX:+UseContainerSupport' and '-XX:MaxRAMPercentage'
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} create-jvm-options '-XX\:+UnlockExperimentalVMOptions:-XX\:+UseCGroupMemoryLimitForHeap:-XX\:MaxRAMFraction=1' && \
-    # FIXME: waiting on fix to https://github.com/payara/Payara/issues/3506
-    #${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.logtoFile=false && \
+    ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.logtoFile=false && \
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} stop-domain ${DOMAIN_NAME} && \
     # Cleanup unused files
     rm -rf \
@@ -89,4 +88,4 @@ RUN mkdir -p ${SCRIPT_DIR}/init.d && \
     chmod +x ${SCRIPT_DIR}/*
 
 ENTRYPOINT ["/tini", "--"]
-CMD ["scripts/entrypoint.sh"]
+CMD ${SCRIPT_DIR}/entrypoint.sh
