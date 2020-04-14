@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk:8u222
+FROM adoptopenjdk/openjdk8-openj9
 
 # Default payara ports to expose
 # 4848: admin console
@@ -42,7 +42,7 @@ RUN groupadd -g 1000 payara && \
     chown -R payara: ${HOME_DIR} && \
     # Install required packages
     apt-get update && \
-    apt-get install -y wget unzip && \
+    apt-get install -y wget unzip gnupg && \
     rm -rf /var/lib/apt/lists/*
 
 # Install tini as minimized init system
@@ -70,9 +70,11 @@ RUN wget --no-verbose -O payara.zip ${PAYARA_PKG} && \
     for MEMORY_JVM_OPTION in $(${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} list-jvm-options | grep "Xm[sx]"); do\
         ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} delete-jvm-options $MEMORY_JVM_OPTION;\
     done && \
-    # FIXME: when upgrading this container to Java 10+, this needs to be changed to '-XX:+UseContainerSupport' and '-XX:MaxRAMPercentage'
+    # FIXME: when upgrading this container to Java 10+, this needs to be changed to '-XX:+UseContainerSupport' and '-XX:MaxRAMPercentage' no
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} create-jvm-options '-XX\:+UnlockExperimentalVMOptions:-XX\:+UseCGroupMemoryLimitForHeap:-XX\:MaxRAMFraction=1' && \
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.logtoFile=false && \
+    ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} delete-jvm-options --profiler=false --target=server-config '-Djavax.net.ssl.keyStore=${com.sun.aas.instanceRoot}/config/keystore.jks:-XX\:+UseG1GC:-Xbootclasspath/p\:${com.sun.aas.installRoot}/lib/grizzly-npn-bootstrap-1.7.jar:-XX\:+UnlockExperimentalVMOptions:-XX\:+UseCGroupMemoryLimitForHeap:-DANTLR_USE_DIRECT_CLASS_LOADING=true:-Xbootclasspath/p\:${com.sun.aas.installRoot}/lib/grizzly-npn-bootstrap-1.6.jar:-Dorg.jboss.weld.serialization.beanIdentifierIndexOptimization=false:-Djavax.net.ssl.trustStore=${com.sun.aas.instanceRoot}/config/cacerts.jks:-XX\:+UseStringDeduplication:-Dorg.glassfish.grizzly.nio.DefaultSelectorHandler.force-selector-spin-detection=true:-XX\:MaxGCPauseMillis=500:-Djdk.tls.rejectClientInitiatedRenegotiation=true:-XX\:+UnlockDiagnosticVMOptions:-Djava.security.auth.login.config=${com.sun.aas.instanceRoot}/config/login.conf:-Djava.awt.headless=true:-Xbootclasspath/p\:${com.sun.aas.installRoot}/lib/grizzly-npn-bootstrap-1.8.jar:-Djdbc.drivers=org.apache.derby.jdbc.ClientDriver:-Xbootclasspath/p\:${com.sun.aas.installRoot}/lib/grizzly-npn-bootstrap-1.8.1.jar:-Djava.ext.dirs=${com.sun.aas.javaRoot}/lib/ext${path.separator}${com.sun.aas.javaRoot}/jre/lib/ext${path.separator}${com.sun.aas.instanceRoot}/lib/ext:-Djdk.corba.allowOutputStreamSubclass=true:-XX\:MaxRAMFraction=1:-Dorg.glassfish.grizzly.DEFAULT_MEMORY_MANAGER=org.glassfish.grizzly.memory.HeapMemoryManager:-Djavax.xml.accessExternalSchema=all:-XX\:MetaspaceSize=256m:-Djava.security.policy=${com.sun.aas.instanceRoot}/config/server.policy:--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED:-Xbootclasspath/a\:${com.sun.aas.installRoot}/lib/grizzly-npn-api.jar:-Djava.endorsed.dirs=${com.sun.aas.installRoot}/modules/endorsed${path.separator}${com.sun.aas.installRoot}/lib/endorsed:-Dcom.sun.enterprise.config.config_environment_factory_class=com.sun.enterprise.config.serverbeans.AppserverConfigEnvironmentFactory:--add-opens=java.base/sun.net.www.protocol.jrt=ALL-UNNAMED:-XX\:MaxMetaspaceSize=2g' && \
+    ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} create-jvm-options --profiler=false --target=server-config '-Djdk.corba.allowOutputStreamSubclass=true:-XX\:+UseG1GC:-Djdk.tls.rejectClientInitiatedRenegotiation=true:-Dcom.sun.enterprise.config.config_environment_factory_class=com.sun.enterprise.config.serverbeans.AppserverConfigEnvironmentFactory:[9|]-Xbootclasspath\/a\:$\{com.sun.aas.installRoot\}\/lib\/grizzly-npn-api.jar:-XX\:+UnlockExperimentalVMOptions:-Djava.security.auth.login.config=$\{com.sun.aas.instanceRoot\}\/config\/login.conf:-XX\:+UseCGroupMemoryLimitForHeap:-Djava.security.policy=$\{com.sun.aas.instanceRoot\}\/config\/server.policy:-Xtune\:virtualized:-Dorg.glassfish.grizzly.DEFAULT_MEMORY_MANAGER=org.glassfish.grizzly.memory.HeapMemoryManager:-Djavax.xml.accessExternalSchema=all:-XX\:MaxRAMFraction=1:[1.8.0.121|1.8.0.160]-Xbootclasspath\/p\:$\{com.sun.aas.installRoot\}\/lib\/grizzly-npn-bootstrap-1.7.jar:[9|]--add-opens=java.base\/sun.net.www.protocol.jrt\=ALL-UNNAMED:-XX\:MetaspaceSize=256m:-Djava.awt.headless=true:-XX\:+UseStringDeduplication:[|8]-Djava.endorsed.dirs=$\{com.sun.aas.installRoot\}\/modules\/endorsed$\{path.separator\}$\{com.sun.aas.installRoot\}\/lib\/endorsed:-Djdbc.drivers=org.apache.derby.jdbc.ClientDriver:-XX\:+UnlockDiagnosticVMOptions:[1.8.0|1.8.0.120]-Xbootclasspath\/p\:$\{com.sun.aas.installRoot\}\/lib\/grizzly-npn-bootstrap-1.6.jar:[1.8.0.161|1.8.0.190]-Xbootclasspath\/p\:$\{com.sun.aas.installRoot\}\/lib\/grizzly-npn-bootstrap-1.8.jar:[1.8.0.191|1.8.0.500]-Xbootclasspath\/p\:$\{com.sun.aas.installRoot\}\/lib\/grizzly-npn-bootstrap-1.8.1.jar:-Djavax.net.ssl.keyStore=$\{com.sun.aas.instanceRoot\}\/config\/keystore.jks:-DANTLR_USE_DIRECT_CLASS_LOADING=true:-Dorg.glassfish.grizzly.nio.DefaultSelectorHandler.force-selector-spin-detection=true:-Xquickstart:-XX\:MaxGCPauseMillis=500:-Djavax.net.ssl.trustStore=$\{com.sun.aas.instanceRoot\}\/config\/cacerts.jks:-Dorg.jboss.weld.serialization.beanIdentifierIndexOptimization=false:[9|]--add-exports=java.base\/jdk.internal.ref\=ALL-UNNAMED:[|8]-Djava.ext.dirs=$\{com.sun.aas.javaRoot\}\/lib\/ext$\{path.separator\}$\{com.sun.aas.javaRoot\}\/jre\/lib\/ext$\{path.separator\}$\{com.sun.aas.instanceRoot\}\/lib\/ext:-XX\:MaxMetaspaceSize=2g' && \
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} stop-domain ${DOMAIN_NAME} && \
     # Cleanup unused files
     rm -rf \
@@ -88,4 +90,4 @@ RUN mkdir -p ${SCRIPT_DIR}/init.d && \
     chmod +x ${SCRIPT_DIR}/*
 
 ENTRYPOINT ["/tini", "--"]
-CMD ${SCRIPT_DIR}/entrypoint.sh
+CMD ["scripts/entrypoint.sh"]
