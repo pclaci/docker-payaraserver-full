@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk8-openj9
+FROM adoptopenjdk/openjdk11-openj9
 
 # Default payara ports to expose
 # 4848: admin console
@@ -8,9 +8,9 @@ FROM adoptopenjdk/openjdk8-openj9
 EXPOSE 4848 9009 8080 8181
 
 # Payara version (5.183+)
-ARG PAYARA_VERSION=5.201
+ARG PAYARA_VERSION=5.193.1
 ARG PAYARA_PKG=https://search.maven.org/remotecontent?filepath=fish/payara/distributions/payara/${PAYARA_VERSION}/payara-${PAYARA_VERSION}.zip
-ARG PAYARA_SHA1=ea86d69233826b4d35612260ea4e8f81a9b992f2
+ARG PAYARA_SHA1=b01e7621b1b31185fdf32892a1bd76aa72e990f4
 ARG TINI_VERSION=v0.18.0
 
 # Initialize the configurable environment variables
@@ -70,7 +70,7 @@ RUN wget --no-verbose -O payara.zip ${PAYARA_PKG} && \
     for MEMORY_JVM_OPTION in $(${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} list-jvm-options | grep "Xm[sx]"); do\
         ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} delete-jvm-options $MEMORY_JVM_OPTION;\
     done && \
-    # FIXME: when upgrading this container to Java 10+, this needs to be changed to '-XX:+UseContainerSupport' and '-XX:MaxRAMPercentage' no
+    # FIXME: when upgrading this container to Java 10+, this needs to be changed to '-XX:+UseContainerSupport' and '-XX:MaxRAMPercentage'
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} create-jvm-options '-XX\:+UnlockExperimentalVMOptions:-XX\:+UseCGroupMemoryLimitForHeap:-XX\:MaxRAMFraction=1' && \
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} set-log-attributes com.sun.enterprise.server.logging.GFFileHandler.logtoFile=false && \
     ${PAYARA_DIR}/bin/asadmin --user=${ADMIN_USER} --passwordfile=${PASSWORD_FILE} delete-jvm-options --profiler=false --target=server-config '-Djavax.net.ssl.keyStore=${com.sun.aas.instanceRoot}/config/keystore.jks:-XX\:+UseG1GC:-Xbootclasspath/p\:${com.sun.aas.installRoot}/lib/grizzly-npn-bootstrap-1.7.jar:-XX\:+UnlockExperimentalVMOptions:-XX\:+UseCGroupMemoryLimitForHeap:-DANTLR_USE_DIRECT_CLASS_LOADING=true:-Xbootclasspath/p\:${com.sun.aas.installRoot}/lib/grizzly-npn-bootstrap-1.6.jar:-Dorg.jboss.weld.serialization.beanIdentifierIndexOptimization=false:-Djavax.net.ssl.trustStore=${com.sun.aas.instanceRoot}/config/cacerts.jks:-XX\:+UseStringDeduplication:-Dorg.glassfish.grizzly.nio.DefaultSelectorHandler.force-selector-spin-detection=true:-XX\:MaxGCPauseMillis=500:-Djdk.tls.rejectClientInitiatedRenegotiation=true:-XX\:+UnlockDiagnosticVMOptions:-Djava.security.auth.login.config=${com.sun.aas.instanceRoot}/config/login.conf:-Djava.awt.headless=true:-Xbootclasspath/p\:${com.sun.aas.installRoot}/lib/grizzly-npn-bootstrap-1.8.jar:-Djdbc.drivers=org.apache.derby.jdbc.ClientDriver:-Xbootclasspath/p\:${com.sun.aas.installRoot}/lib/grizzly-npn-bootstrap-1.8.1.jar:-Djava.ext.dirs=${com.sun.aas.javaRoot}/lib/ext${path.separator}${com.sun.aas.javaRoot}/jre/lib/ext${path.separator}${com.sun.aas.instanceRoot}/lib/ext:-Djdk.corba.allowOutputStreamSubclass=true:-XX\:MaxRAMFraction=1:-Dorg.glassfish.grizzly.DEFAULT_MEMORY_MANAGER=org.glassfish.grizzly.memory.HeapMemoryManager:-Djavax.xml.accessExternalSchema=all:-XX\:MetaspaceSize=256m:-Djava.security.policy=${com.sun.aas.instanceRoot}/config/server.policy:--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED:-Xbootclasspath/a\:${com.sun.aas.installRoot}/lib/grizzly-npn-api.jar:-Djava.endorsed.dirs=${com.sun.aas.installRoot}/modules/endorsed${path.separator}${com.sun.aas.installRoot}/lib/endorsed:-Dcom.sun.enterprise.config.config_environment_factory_class=com.sun.enterprise.config.serverbeans.AppserverConfigEnvironmentFactory:--add-opens=java.base/sun.net.www.protocol.jrt=ALL-UNNAMED:-XX\:MaxMetaspaceSize=2g' && \
